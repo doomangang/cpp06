@@ -1,9 +1,12 @@
 #include "ScalarConverter.hpp"
 
-std::string    convertToChar(double number);
-int convertToInt(double number);
-float   convertToFloat(double number);
-double  convertToDouble(double number);
+std::string convertToChar(double number);
+int         convertToInt(double number);
+float       convertToFloat(double number);
+
+const char  *ScalarConverter::NonDisplayableException::what() const throw() { return "Non displayable"; }
+const char  *ScalarConverter::ImpossibleException::what() const throw() { return "impossible"; }
+const char  *ScalarConverter::NumberFormatException::what() const throw() { return "Wrong Numeric Representation"; }
 
 ScalarConverter::ScalarConverter() {
     std::cout << GREEN << "ScalarConverter default constructor called\n" << RESET << std::endl;
@@ -25,8 +28,13 @@ ScalarConverter& ScalarConverter::operator=(const ScalarConverter& other) {
 }
 
 double  parseNumber(char* number) {
-    double  double_num;
-
+    char *ptr = NULL;
+    errno = 0;
+    double  double_num = strtod(number, &ptr);
+    if (ptr == number || *ptr != '\0')
+        throw ScalarConverter::ImpossibleException();
+    if (errno == ERANGE) 
+        throw ScalarConverter::ImpossibleException();
     return double_num;
 }
 
@@ -34,20 +42,15 @@ void ScalarConverter::convert(char* number)
 {
     double  double_num;
 
-    try {
-        double_num = parseNumber(number);
-    }
+    try { double_num = parseNumber(number); }
     catch (const std::exception& e) {
-        std::cout << "char: " << e.what() << std::endl;
-        std::cout << "int: " << e.what() << std::endl;
-        std::cout << "float: " << e.what() << std::endl;
-        std::cout << "double: " << e.what() << std::endl;
+        std::cerr << RED << e.what() << RESET << std::endl;
         return ;
     }
-    try {convertToChar(double_num);} catch (const std::exception& e){std::cout << "char: " << e.what() << std::endl;}
-    try {convertToInt(double_num);} catch (const std::exception& e){std::cout << "char: " << e.what() << std::endl;}
-    try {convertToFloat(double_num);} catch (const std::exception& e){std::cout << "char: " << e.what() << std::endl;}
-    try {convertToDouble(double_num);} catch (const std::exception& e){std::cout << "char: " << e.what() << std::endl;}
+    try {std::cout << "char: " << convertToChar(double_num) << std::endl; } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+    try {convertToInt(double_num);} catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+    try {convertToFloat(double_num);} catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+    try {std::cout << "double: " << double_num << std::endl; } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
 }
 
 std::string    convertToChar(double number)
@@ -60,16 +63,19 @@ std::string    convertToChar(double number)
 
 int convertToInt(double number)
 {
-    //over/underflow
-    return atoi(number);
+    //over/underflow handling
+    if (number > static_cast<double>(std::numeric_limits<int>::max()))
+        throw ScalarConverter::ImpossibleException();
+    if (number < static_cast<double>(std::numeric_limits<int>::min()))
+        throw ScalarConverter::ImpossibleException();
+    return static_cast<int>(number);
 }
 
-float   convertToFloat(double number)
+float  convertToFloat(double number)
 {
-    return strtof(number, 0);
-}
-
-double  convertToDouble(double number)
-{
-    return strtod(number, 0);
+    if (number > static_cast<double>(std::numeric_limits<float>::max()))
+        throw ScalarConverter::ImpossibleException();
+    if (number < -static_cast<double>(std::numeric_limits<float>::max()))
+        throw ScalarConverter::ImpossibleException();
+    return static_cast<float>(number);
 }

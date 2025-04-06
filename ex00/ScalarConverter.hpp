@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cerrno>
+#include <limits>
 
 /* Color Sets */
 #define RESET   "\033[0m"
@@ -25,12 +27,28 @@ private:
     ScalarConverter(const ScalarConverter& other);
     ~ScalarConverter();
     ScalarConverter& operator=(const ScalarConverter& other);
+    
 public:
     /* getter & setter */
 
     /* additional methods */
     static void convert(char* number);
+
     /* exception classes */
+    class NonDisplayableException : public std::exception {
+        public:
+            const char *what() const throw();
+    };
+
+    class ImpossibleException : public std::exception {
+        public:
+            const char *what() const throw();
+    };
+
+    class NumberFormatException : public std::exception {
+        public:
+            const char *what() const throw();
+    };
 };
 
 /* operators */
