@@ -1,6 +1,6 @@
 #include "ScalarConverter.hpp"
 
-std::string convertToChar(double number);
+char        convertToChar(double number);
 int         convertToInt(double number);
 float       convertToFloat(double number);
 
@@ -47,22 +47,52 @@ void ScalarConverter::convert(char* number)
         std::cerr << RED << e.what() << RESET << std::endl;
         return ;
     }
-    try {std::cout << "char: " << convertToChar(double_num) << std::endl; } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
-    try {convertToInt(double_num);} catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
-    try {convertToFloat(double_num);} catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
-    try {std::cout << "double: " << double_num << std::endl; } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+
+    //char
+    try {
+        char c = convertToChar(double_num);
+        std::cout << "char: " << c << std::endl; 
+    } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+
+    //int
+    try {
+        int i = convertToInt(double_num);
+        std::cout << "int: " << i << std::endl; 
+    } catch (const std::exception& e){std::cerr << "int: " << e.what() << std::endl;}
+    
+    //float
+    try {
+        float f = convertToFloat(double_num);
+        std::cout << "float: " 
+                    << std::fixed
+                    << std::showpoint
+                    << f
+                    << 'f'
+                    << std::endl; 
+    } catch (const std::exception& e){std::cerr << "float: " << e.what() << std::endl;}
+
+    //double
+    try {
+        std::cout << "double: " 
+                    << std::fixed
+                    << std::showpoint
+                    << double_num 
+                    << std::endl; 
+    } catch (const std::exception& e){std::cerr << "double: " << e.what() << std::endl;}
 }
 
-std::string    convertToChar(double number)
+char    convertToChar(double number)
 {
     int intNum = static_cast<int>(number);
     if (intNum < 1 || intNum > 128)
-        return ("Non displayable");
-    return std::string(1, static_cast<char>(intNum));
+        throw ScalarConverter::NonDisplayableException();
+    return static_cast<char>(intNum);
 }
 
 int convertToInt(double number)
 {
+    if (std::isnan(number) || std::isinf(number))
+        throw ScalarConverter::ImpossibleException();
     //over/underflow handling
     if (number > static_cast<double>(std::numeric_limits<int>::max()))
         throw ScalarConverter::ImpossibleException();
