@@ -31,7 +31,7 @@ double  parseNumber(char* number) {
     char *ptr = NULL;
     errno = 0;
     double  double_num = strtod(number, &ptr);
-    if (ptr == number || *ptr != '\0')
+    if (ptr == number || (*ptr != '\0' && *ptr != 'f'))
         throw ScalarConverter::ImpossibleException();
     if (errno == ERANGE) 
         throw ScalarConverter::ImpossibleException();
@@ -84,6 +84,8 @@ void ScalarConverter::convert(char* number)
 char    convertToChar(double number)
 {
     int intNum = static_cast<int>(number);
+    if (std::isnan(number) || std::isinf(number))
+        throw ScalarConverter::ImpossibleException();
     if (intNum < 1 || intNum > 128)
         throw ScalarConverter::NonDisplayableException();
     return static_cast<char>(intNum);
