@@ -8,25 +8,6 @@ const char  *ScalarConverter::NonDisplayableException::what() const throw() { re
 const char  *ScalarConverter::ImpossibleException::what() const throw() { return "impossible"; }
 const char  *ScalarConverter::NumberFormatException::what() const throw() { return "Wrong Numeric Representation"; }
 
-ScalarConverter::ScalarConverter() {
-    std::cout << GREEN << "ScalarConverter default constructor called\n" << RESET << std::endl;
-}
-
-ScalarConverter::ScalarConverter(const ScalarConverter& other) {
-    *this = other;
-    std::cout << GREEN << "ScalarConverter copy constructor called\n" << RESET << std::endl;
-}
-
-ScalarConverter::~ScalarConverter() {
-    std::cout << RED << "ScalarConverter destructor called\n" << RESET << std::endl;
-}
-
-ScalarConverter& ScalarConverter::operator=(const ScalarConverter& other) {
-    std::cout << YELLOW << "ScalarConverter assignment operator called\n" << RESET << std::endl;
-    (void)other;
-    return *this;
-}
-
 double  parseNumber(char* number) {
     char *ptr = NULL;
     errno = 0;
