@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cmath>
 #include <limits>
+#include <string>
 
 /* Color Sets */
 #define RESET   "\033[0m"
@@ -19,6 +20,14 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 #define GREY    "\033[38;5;250m"
+
+enum LiteralType {
+    LT_CHAR,
+    LT_INT,
+    LT_FLOAT,
+    LT_DOUBLE,
+    LT_INVALID
+};
 
 class ScalarConverter {
 private:
@@ -53,5 +62,14 @@ public:
     };
 };
 
-/* operators */
+LiteralType  detectType(std::string number);
+
+void    handleChar(std::string number);
+void    handleInt(std::string number);
+void    handleFloat(std::string number);
+void    handleDouble(std::string number);
+
+bool    convertToInt(std::string input, int &result);
+
+
 #endif

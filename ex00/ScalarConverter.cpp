@@ -1,94 +1,57 @@
 #include "ScalarConverter.hpp"
 
-char        convertToChar(double number);
-int         convertToInt(double number);
-float       convertToFloat(double number);
-
-const char  *ScalarConverter::NonDisplayableException::what() const throw() { return "Non displayable"; }
-const char  *ScalarConverter::ImpossibleException::what() const throw() { return "impossible"; }
-const char  *ScalarConverter::NumberFormatException::what() const throw() { return "Wrong Numeric Representation"; }
-
-double  parseNumber(char* number) {
-    char *ptr = NULL;
-    errno = 0;
-    double  double_num = strtod(number, &ptr);
-    if (ptr == number || (*ptr != '\0' && *ptr != 'f'))
-        throw ScalarConverter::ImpossibleException();
-    if (errno == ERANGE) 
-        throw ScalarConverter::ImpossibleException();
-    return double_num;
-}
-
 void ScalarConverter::convert(char* number)
 {
-    double  double_num;
+    LiteralType type = detectType(number);
 
-    try { double_num = parseNumber(number); }
-    catch (const std::exception& e) {
-        std::cerr << RED << e.what() << RESET << std::endl;
-        return ;
+    switch (type)
+    {
+        case LT_CHAR:
+            handleChar(number);
+            break;
+        case LT_INT:
+            handleInt(number);
+            break;
+        case LT_FLOAT:
+            handleFloat(number);
+            break;
+        case LT_DOUBLE:
+            handleDouble(number);
+            break;
+        default:
+            std::cout << "Error: invalid literal format" << std::endl;
+            break;
     }
+}
+
+LiteralType  detectType(std::string number) {
 
     //char
-    try {
-        char c = convertToChar(double_num);
-        std::cout << "char: " << c << std::endl; 
-    } catch (const std::exception& e){std::cerr << "char: " << e.what() << std::endl;}
+    if (number.length() == 1 && !isdigit(number[0]))
+        return LT_CHAR;
+    if (number.length() == 3 && number[0] == '\'' && number[2] == '\'' && !isdigit(number[1]))
+        return LT_CHAR;
 
-    //int
-    try {
-        int i = convertToInt(double_num);
-        std::cout << "int: " << i << std::endl; 
-    } catch (const std::exception& e){std::cerr << "int: " << e.what() << std::endl;}
+    //pseudo-literal
+    if (number == "nan" || number == "+inf" || number == "-inf")
+        return LT_DOUBLE;
+    if (number == "nanf" || number == "+inff" || number == "-inff")
+        return LT_FLOAT;
     
-    //float
-    try {
-        float f = convertToFloat(double_num);
-        std::cout << "float: " 
-                    << std::fixed
-                    << std::showpoint
-                    << f
-                    << 'f'
-                    << std::endl; 
-    } catch (const std::exception& e){std::cerr << "float: " << e.what() << std::endl;}
+    bool    hasDot = (number.find('.') != std::string::npos);
+    bool    endsF = (!number.empty() && number[number.length() - 1] == 'f');
 
-    //double
-    try {
-        std::cout << "double: " 
-                    << std::fixed
-                    << std::showpoint
-                    << double_num 
-                    << std::endl; 
-    } catch (const std::exception& e){std::cerr << "double: " << e.what() << std::endl;}
-}
+    if (hasDot) {
+        if (endsF) return LT_FLOAT;
+        return LT_DOUBLE;
+    }
 
-char    convertToChar(double number)
-{
-    int intNum = static_cast<int>(number);
-    if (std::isnan(number) || std::isinf(number))
-        throw ScalarConverter::ImpossibleException();
-    if (intNum < 1 || intNum > 128)
-        throw ScalarConverter::NonDisplayableException();
-    return static_cast<char>(intNum);
-}
-
-int convertToInt(double number)
-{
-    if (std::isnan(number) || std::isinf(number))
-        throw ScalarConverter::ImpossibleException();
-    //over/underflow handling
-    if (number > static_cast<double>(std::numeric_limits<int>::max()))
-        throw ScalarConverter::ImpossibleException();
-    if (number < static_cast<double>(std::numeric_limits<int>::min()))
-        throw ScalarConverter::ImpossibleException();
-    return static_cast<int>(number);
-}
-
-float  convertToFloat(double number)
-{
-    if (number > static_cast<double>(std::numeric_limits<float>::max()))
-        throw ScalarConverter::ImpossibleException();
-    if (number < -static_cast<double>(std::numeric_limits<float>::max()))
-        throw ScalarConverter::ImpossibleException();
-    return static_cast<float>(number);
+    size_t i = 0;
+    if (!number.empty() && (number[0] == '+' || number[0] == '-'))
+        i++;
+    for (; i < number.length(); i++) {
+        if (!isdigit(number[i]))
+            return LT_INVALID;
+    }
+    return LT_INT;
 }

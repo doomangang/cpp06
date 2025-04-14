@@ -3,7 +3,7 @@ NAME	= convert
 CC		= c++
 CFLAGS	= -Wall -Wextra -Werror -std=c++98 #-fsanitize=address
 
-SRCS	= ScalarConverter.cpp main.cpp Ocf.cpp
+SRCS	= ScalarConverter.cpp main.cpp Ocf.cpp Print.cpp
 
 OBJS	= $(SRCS:.cpp=.o)
 
