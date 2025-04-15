@@ -8,6 +8,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <sstream>
 
 /* Color Sets */
 #define RESET   "\033[0m"
