@@ -4,24 +4,33 @@ void ScalarConverter::convert(char* number)
 {
     LiteralType type = detectType(number);
 
-    switch (type)
+    try
     {
-        case LT_CHAR:
-            handleChar(number);
-            break;
-        case LT_INT:
-            handleInt(number);
-            break;
-        case LT_FLOAT:
-            handleFloat(number);
-            break;
-        case LT_DOUBLE:
-            handleDouble(number);
-            break;
-        default:
-            std::cout << "Error: invalid literal format" << std::endl;
-            break;
+        switch (type)
+        {
+            case LT_CHAR:
+                handleChar(number);
+                break;
+            case LT_INT:
+                handleInt(number);
+                break;
+            case LT_FLOAT:
+                handleFloat(number);
+                break;
+            case LT_DOUBLE:
+                handleDouble(number);
+                break;
+            default:
+                std::cout << "Error: invalid literal format" << std::endl;
+                break;
+        }
     }
+    catch(const std::exception& e)
+    {
+        std::cerr << RED << e.what() << '\n' << RESET;
+    }
+    
+    
 }
 
 LiteralType  detectType(std::string number) {
@@ -55,3 +64,12 @@ LiteralType  detectType(std::string number) {
     }
     return LT_INT;
 }
+
+ScalarConverter::WrongNumberException::WrongNumberException(const std::string& type) 
+: _msg("Conversion error: invalid input for type \"" + type + "\"") {}
+
+const char *ScalarConverter::WrongNumberException::what() const throw() {
+	return _msg.c_str();
+}
+
+ScalarConverter::WrongNumberException::~WrongNumberException() throw() {}

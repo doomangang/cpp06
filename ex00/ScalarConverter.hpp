@@ -47,18 +47,11 @@ public:
     static void convert(char* number);
 
     /* exception classes */
-    class NonDisplayableException : public std::exception {
+    class WrongNumberException : public std::exception {
+        std::string _msg;
         public:
-            const char *what() const throw();
-    };
-
-    class ImpossibleException : public std::exception {
-        public:
-            const char *what() const throw();
-    };
-
-    class NumberFormatException : public std::exception {
-        public:
+            WrongNumberException(const std::string& type);
+            virtual ~WrongNumberException() throw();
             const char *what() const throw();
     };
 };
@@ -69,8 +62,6 @@ void    handleChar(std::string number);
 void    handleInt(std::string number);
 void    handleFloat(std::string number);
 void    handleDouble(std::string number);
-
-bool    convertToInt(std::string input, int &result);
 
 
 #endif

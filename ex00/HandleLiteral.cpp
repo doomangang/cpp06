@@ -22,10 +22,8 @@ void    handleInt(std::string number) {
     std::istringstream  iss(number);
     iss >> i;
 
-    if (iss.fail()) {
-        std::cout << "char: impossible" << std::endl;
-        std::cout << "int: impossible" << std::endl;
-    }
+    if (iss.fail())
+        throw ScalarConverter::WrongNumberException("INT");
     else {
         std::cout << "char: ";
         if (std::isprint(i))
@@ -59,50 +57,59 @@ void    handleInt(std::string number) {
 }
 
 void    handleFloat(std::string number) {
-    float f = static_cast<float>(atof(number.c_str()));
+    char* end = 0;
+    float f = strtof(number.c_str(), &end);
+    bool rangeErr = (errno == ERANGE);
+    if (rangeErr)
+        throw ScalarConverter::WrongNumberException("FLOAT");
+
     char c = static_cast<char>(f);
     if (std::isprint(c))
         std::cout << "char: '" << c << "'" << std::endl;
+    else if (std::isnan(f) || std::isinf(f))
+        std::cout << "char: impossible" << std::endl;
     else
         std::cout << "char: Non displayable" << std::endl;
+    
+    if (std::isnan(f) || std::isinf(f))
+        std::cout << "int: impossible" << std::endl;
+    else if (f > std::numeric_limits<int>::max() || f < std::numeric_limits<int>::min())
+        std::cout << "int: impossible" << std::endl;
+    else
+        std::cout << "int: " << static_cast<int>(f) << std::endl;
 
-    std::cout << "int: " << static_cast<int>(f) << std::endl;
+
     std::cout << "float: " 
-              << std::fixed << std::setprecision(1) << f << "f" << std::endl;
+            << std::fixed << f << "f" << std::endl;
     std::cout << "double: " 
-              << std::fixed << std::setprecision(1) << static_cast<double>(f) << std::endl;
+            << std::fixed << static_cast<double>(f) << std::endl;
 }
 
 void    handleDouble(std::string number){
-    double d = atof(number.c_str());
+    char* end = 0;
+    double d = strtod(number.c_str(), &end);
+    bool rangeErr = (errno == ERANGE);
+    if (rangeErr)
+        throw ScalarConverter::WrongNumberException("DOUBLE");
+
     char c = static_cast<char>(d);
     if (std::isprint(c))
         std::cout << "char: '" << c << "'" << std::endl;
+    else if (std::isnan(d) || std::isinf(d))
+        std::cout << "char: impossible" << std::endl;
     else
         std::cout << "char: Non displayable" << std::endl;
 
-    std::cout << "int: " << static_cast<int>(d) << std::endl;
+    if (std::isnan(d) || std::isinf(d))
+        std::cout << "int: impossible" << std::endl;
+    else if (d > std::numeric_limits<int>::max() || d < std::numeric_limits<int>::min())
+        std::cout << "int: impossible" << std::endl;
+    else
+        std::cout << "int: " << static_cast<int>(d) << std::endl;
+    
     std::cout << "float: " 
-              << std::fixed << std::setprecision(1) << static_cast<float>(d) << "f" << std::endl;
+            << std::fixed << static_cast<float>(d) << "f" << std::endl;
+    
     std::cout << "double: " 
-              << std::fixed << std::setprecision(1) << d << std::endl;
-}
-
-bool convertToInt(std::string input, int &result)
-{
-    errno = 0;
-    char *endPtr = 0;
-    long l = std::strtol(input.c_str(), &endPtr, 10);
-    
-    if (endPtr == input.c_str() || *endPtr != '\0')
-        return false;
-    
-    if (errno == ERANGE)
-        return false;
-    
-    if (l > std::numeric_limits<int>::max() || l < std::numeric_limits<int>::min())
-        return false;
-    
-    result = static_cast<int>(l);
-    return true;
+            << std::fixed << d << std::endl;
 }
