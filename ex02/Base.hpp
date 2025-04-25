@@ -17,17 +17,8 @@
 
 class Base {
 private:
-    /* member attributes */
 public:
-    /* Orthodox Canonical Form (OCF) */
     virtual    ~Base();
-
-    /* getter & setter */
-
-    /* additional methods */
-
-    /* exception classes */
 };
 
-/* operators */
 #endif
