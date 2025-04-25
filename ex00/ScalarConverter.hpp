@@ -39,29 +39,29 @@ private:
     ScalarConverter(const ScalarConverter& other);
     ~ScalarConverter();
     ScalarConverter& operator=(const ScalarConverter& other);
+
+    static LiteralType detectType(const std::string& s);
+
+    static void handleChar(const std::string& s);
+    static void handleInt(const std::string& s);
+    static void handleFloat(const std::string& s);
+    static void handleDouble(const std::string& s);
     
 public:
     /* getter & setter */
 
     /* additional methods */
-    static void convert(char* number);
+    static void convert(const std::string& input);
 
     /* exception classes */
     class WrongNumberException : public std::exception {
         std::string _msg;
         public:
-            WrongNumberException(const std::string& type);
+            explicit WrongNumberException(const std::string& type);
             virtual ~WrongNumberException() throw();
             const char *what() const throw();
     };
 };
-
-LiteralType  detectType(std::string number);
-
-void    handleChar(std::string number);
-void    handleInt(std::string number);
-void    handleFloat(std::string number);
-void    handleDouble(std::string number);
 
 
 #endif
