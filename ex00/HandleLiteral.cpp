@@ -51,13 +51,13 @@ void ScalarConverter::handleFloat(const std::string& s) {
     errno = 0;
     char* end = 0;
     float f = std::strtof(s.c_str(), &end);
+    int iv = static_cast<int>(f);
     bool err = (errno == ERANGE) || (*end != 'f' && *end != '\0');
     if (err) throw WrongNumberException("float");
 
     if (std::isnan(f) || std::isinf(f)) {
         std::cout << "char: impossible\nint: impossible\n";
     } else {
-        int iv = static_cast<int>(f);
         std::cout << "char: ";
         if (!isPrintable(iv))
             std::cout << (iv >= std::numeric_limits<char>::min() && iv <= std::numeric_limits<char>::max()
@@ -74,21 +74,21 @@ void ScalarConverter::handleFloat(const std::string& s) {
         std::cout << std::endl;
     }
 
-    std::cout << "float: "  << f << "f" << std::endl
-              << "double: " << static_cast<double>(f) << std::endl;
+    std::cout << "float: "  << f << ((f - iv) ? "f" : ".0f") <<  std::endl
+              << "double: " << static_cast<double>(f) << ((f - iv) ? "" : ".0") << std::endl;
 }
 
 void ScalarConverter::handleDouble(const std::string& s) {
     errno = 0;
     char* end = 0;
     double d = std::strtod(s.c_str(), &end);
+    int iv = static_cast<int>(d);
     bool err = (errno == ERANGE) || (*end != '\0');
     if (err) throw WrongNumberException("double");
 
     if (std::isnan(d) || std::isinf(d)) {
         std::cout << "char: impossible\nint: impossible\n";
     } else {
-        int iv = static_cast<int>(d);
         std::cout << "char: ";
         if (!isPrintable(iv))
             std::cout << (iv >= std::numeric_limits<char>::min() && iv <= std::numeric_limits<char>::max()
@@ -106,6 +106,6 @@ void ScalarConverter::handleDouble(const std::string& s) {
     }
 
     float f = static_cast<float>(d);
-    std::cout << "float: "  << f  << "f\n"
-              << "double: " << d  << std::endl;
+    std::cout << "float: "  << f << ((f - iv) ? "f" : ".0f") << "\n"
+              << "double: " << d << ((d - iv) ? "" : ".0") << std::endl;
 }
